@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>لوحة التحكم — دليل الأجانب في تركيا</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+  :root{--deep-teal:#0E3A3F;--gold:#C8963E;--plaster:#F3EEE3;--terracotta:#B1523A;--ink:#1B2422;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--plaster);font-family:'Cairo',sans-serif;color:var(--ink);}
+  .wrap{max-width:520px;margin:0 auto;padding:24px 20px 60px;}
+  h1{font-family:'Tajawal',sans-serif;font-weight:900;color:var(--deep-teal);font-size:20px;}
+  .card{background:#fff;border-radius:16px;padding:20px;border:1px solid rgba(0,0,0,.06);margin-bottom:16px;}
+  label{display:block;font-size:12px;font-weight:700;margin:0 0 6px;color:var(--ink);}
+  input, select, textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,.12);font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:14px;background:#faf9f6;}
+  textarea{min-height:110px;resize:vertical;}
+  button{cursor:pointer;border:0;border-radius:10px;font-weight:700;font-size:14px;padding:11px 18px;font-family:'Cairo',sans-serif;}
+  .btn-primary{background:var(--deep-teal);color:#fff;width:100%;}
+  .btn-danger{background:var(--terracotta);color:#fff;}
+  .btn-ghost{background:#eee;color:var(--ink);}
+  .row{display:flex;gap:8px;}
+  .item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:#faf9f6;margin-bottom:8px;}
+  .item .meta{font-size:12px;color:rgba(27,36,34,.5);}
+  .item p{margin:0;font-size:13px;font-weight:700;}
+  .locked{text-align:center;padding-top:80px;}
+  .locked input{max-width:240px;margin:16px auto;}
+  .locked button{max-width:240px;margin:0 auto;display:block;}
+  #status{font-size:12px;margin-top:8px;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div id="lockScreen" class="wrap locked">
+  <h1>لوحة تحكم دليل الأجانب</h1>
+  <p style="font-size:13px;color:rgba(27,36,34,.6);">أدخل كلمة المرور للمتابعة</p>
+  <input type="password" id="pwInput" placeholder="كلمة المرور" />
+  <button class="btn-primary" onclick="tryLogin()">دخول</button>
+  <p id="loginError" style="color:var(--terracotta);font-size:12px;"></p>
+</div>
+
+<div id="panel" class="wrap hidden">
+  <h1>نشر مقال جديد</h1>
+  <div class="card">
+    <label>عنوان المقال</label>
+    <input id="fTitle" placeholder="مثال: خطوات الحصول على الإقامة" />
+
+    <label>القسم</label>
+    <select id="fCategory">
+      <option value="الإقامة">الإقامة</option>
+      <option value="العمل">العمل</option>
+      <option value="السكن">السكن</option>
+      <option value="الصحة">الصحة</option>
+      <option value="التعليم">التعليم</option>
+      <option value="خدمات">خدمات أخرى</option>
+    </select>
+
+    <label>مدة القراءة (اختياري)</label>
+    <input id="fMinutes" placeholder="مثال: 5 دقائق" />
+
+    <label>نص المقال</label>
+    <textarea id="fContent" placeholder="اكتب محتوى المقال هنا..."></textarea>
+
+    <button class="btn-primary" onclick="publishArticle()">نشر المقال</button>
+    <p id="articleStatus"></p>
+  </div>
+
+  <h1>إضافة فيديو من القناة</h1>
+  <div class="card">
+    <label>عنوان الفيديو</label>
+    <input id="vTitle" placeholder="مثال: تجربتي الكاملة في استخراج الإقامة" />
+    <label>رابط الفيديو على يوتيوب</label>
+    <input id="vUrl" placeholder="https://youtube.com/..." />
+    <label>عدد المشاهدات (اختياري، نص حر)</label>
+    <input id="vViews" placeholder="مثال: 128 ألف مشاهدة" />
+    <button class="btn-primary" onclick="publishVideo()">نشر الفيديو</button>
+    <p id="videoStatus"></p>
+  </div>
+
+  <h1>المقالات المنشورة</h1>
+  <div class="card" id="articlesList">
+    <p style="font-size:12px;color:rgba(27,36,34,.5);">جارِ التحميل...</p>
+  </div>
+
+  <h1>الفيديوهات المنشورة</h1>
+  <div class="card" id="videosList">
+    <p style="font-size:12px;color:rgba(27,36,34,.5);">جارِ التحميل...</p>
+  </div>
+
+  <h1>رسائل التواصل</h1>
+  <div class="card" id="messagesList">
+    <p style="font-size:12px;color:rgba(27,36,34,.5);">جارِ التحميل...</p>
+  </div>
+
+  <h1>تغيير كلمة المرور</h1>
+  <div class="card">
+    <label>كلمة المرور الحالية</label>
+    <input type="password" id="pwCurrent" placeholder="كلمة المرور الحالية" />
+
+    <label>كلمة المرور الجديدة</label>
+    <input type="password" id="pwNew" placeholder="كلمة المرور الجديدة" />
+
+    <label>تأكيد كلمة المرور الجديدة</label>
+    <input type="password" id="pwConfirm" placeholder="أعد كتابة كلمة المرور الجديدة" />
+
+    <button class="btn-primary" onclick="changePassword()">تحديث كلمة المرور</button>
+    <p id="pwStatus"></p>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_PASSWORD = "Rayan_2026";
+  let currentPassword = null;
+
+  function getPassword() {
+    return db.collection("config").doc("admin").get().then((doc) => {
+      if (doc.exists && doc.data().password) {
+        currentPassword = doc.data().password;
+      } else {
+        currentPassword = DEFAULT_PASSWORD;
+      }
+      return currentPassword;
+    }).catch(() => {
+      currentPassword = DEFAULT_PASSWORD;
+      return currentPassword;
+    });
+  }
+
+  function tryLogin() {
+    const val = document.getElementById("pwInput").value;
+    getPassword().then((pw) => {
+      if (val === pw) {
+        document.getElementById("lockScreen").classList.add("hidden");
+        document.getElementById("panel").classList.remove("hidden");
+        loadArticles();
+        loadVideos();
+        loadMessages();
+      } else {
+        document.getElementById("loginError").innerText = "كلمة المرور غير صحيحة";
+      }
+    });
+  }
+
+  function changePassword() {
+    const cur = document.getElementById("pwCurrent").value;
+    const next = document.getElementById("pwNew").value;
+    const confirm = document.getElementById("pwConfirm").value;
+    const status = document.getElementById("pwStatus");
+
+    if (cur !== currentPassword) {
+      status.style.color = "#B1523A";
+      status.innerText = "كلمة المرور الحالية غير صحيحة";
+      return;
+    }
+    if (!next || next.length < 4) {
+      status.style.color = "#B1523A";
+      status.innerText = "كلمة المرور الجديدة قصيرة جدًا (4 أحرف على الأقل)";
+      return;
+    }
+    if (next !== confirm) {
+      status.style.color = "#B1523A";
+      status.innerText = "كلمة المرور الجديدة والتأكيد غير متطابقين";
+      return;
+    }
+
+    db.collection("config").doc("admin").set({ password: next }).then(() => {
+      currentPassword = next;
+      status.style.color = "#0E3A3F";
+      status.innerText = "تم تحديث كلمة المرور بنجاح ✅";
+      document.getElementById("pwCurrent").value = "";
+      document.getElementById("pwNew").value = "";
+      document.getElementById("pwConfirm").value = "";
+    }).catch((e) => {
+      status.style.color = "#B1523A";
+      status.innerText = "خطأ: " + e.message;
+    });
+  }
+
+  function publishArticle() {
+    const title = document.getElementById("fTitle").value.trim();
+    const category = document.getElementById("fCategory").value;
+    const minutes = document.getElementById("fMinutes").value.trim();
+    const content = document.getElementById("fContent").value.trim();
+    if (!title || !content) {
+      document.getElementById("articleStatus").innerText = "اكتب العنوان والنص على الأقل";
+      return;
+    }
+    db.collection("articles").add({
+      title, category, minutes, content,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }).then(() => {
+      document.getElementById("articleStatus").innerText = "تم النشر بنجاح ✅";
+      document.getElementById("fTitle").value = "";
+      document.getElementById("fMinutes").value = "";
+      document.getElementById("fContent").value = "";
+      loadArticles();
+    }).catch((e) => {
+      document.getElementById("articleStatus").innerText = "خطأ: " + e.message;
+    });
+  }
+
+  function publishVideo() {
+    const title = document.getElementById("vTitle").value.trim();
+    const url = document.getElementById("vUrl").value.trim();
+    const views = document.getElementById("vViews").value.trim();
+    if (!title || !url) {
+      document.getElementById("videoStatus").innerText = "اكتب العنوان والرابط على الأقل";
+      return;
+    }
+    db.collection("videos").add({
+      title, url, views,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }).then(() => {
+      document.getElementById("videoStatus").innerText = "تم النشر بنجاح ✅";
+      document.getElementById("vTitle").value = "";
+      document.getElementById("vUrl").value = "";
+      document.getElementById("vViews").value = "";
+      loadVideos();
+    }).catch((e) => {
+      document.getElementById("videoStatus").innerText = "خطأ: " + e.message;
+    });
+  }
+
+  function loadArticles() {
+    db.collection("articles").orderBy("createdAt", "desc").get().then((snap) => {
+      const el = document.getElementById("articlesList");
+      if (snap.empty) { el.innerHTML = "<p style='font-size:12px;color:rgba(27,36,34,.5);'>لا يوجد مقالات بعد</p>"; return; }
+      el.innerHTML = "";
+      snap.forEach((doc) => {
+        const d = doc.data();
+        el.innerHTML += `<div class="item">
+          <div><p>${d.title}</p><span class="meta">${d.category || ""} ${d.minutes ? "· " + d.minutes : ""}</span></div>
+          <button class="btn-danger" onclick="deleteDoc('articles','${doc.id}')">حذف</button>
+        </div>`;
+      });
+    });
+  }
+
+  function loadVideos() {
+    db.collection("videos").orderBy("createdAt", "desc").get().then((snap) => {
+      const el = document.getElementById("videosList");
+      if (snap.empty) { el.innerHTML = "<p style='font-size:12px;color:rgba(27,36,34,.5);'>لا يوجد فيديوهات بعد</p>"; return; }
+      el.innerHTML = "";
+      snap.forEach((doc) => {
+        const d = doc.data();
+        el.innerHTML += `<div class="item">
+          <div><p>${d.title}</p><span class="meta">${d.views || ""}</span></div>
+          <button class="btn-danger" onclick="deleteDoc('videos','${doc.id}')">حذف</button>
+        </div>`;
+      });
+    });
+  }
+
+  function loadMessages() {
+    db.collection("messages").orderBy("createdAt", "desc").limit(30).get().then((snap) => {
+      const el = document.getElementById("messagesList");
+      if (snap.empty) { el.innerHTML = "<p style='font-size:12px;color:rgba(27,36,34,.5);'>لا يوجد رسائل بعد</p>"; return; }
+      el.innerHTML = "";
+      snap.forEach((doc) => {
+        const d = doc.data();
+        el.innerHTML += `<div class="item" style="flex-direction:column;align-items:flex-start;gap:6px;">
+          <div style="display:flex;justify-content:space-between;width:100%;">
+            <p>${d.name || "بدون اسم"} ${d.contact ? "· " + d.contact : ""}</p>
+            <button class="btn-danger" onclick="deleteDoc('messages','${doc.id}')">حذف</button>
+          </div>
+          <span class="meta">${d.message}</span>
+        </div>`;
+      });
+    });
+  }
+
+  function deleteDoc(col, id) {
+    db.collection(col).doc(id).delete().then(() => {
+      if (col === "articles") loadArticles();
+      else if (col === "videos") loadVideos();
+      else if (col === "messages") loadMessages();
+    });
+  }
+</script>
+</body>
+</html>

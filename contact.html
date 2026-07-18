@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>تواصل معنا — دليل الأجانب في تركيا</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0E3A3F" />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+  :root{--deep-teal:#0E3A3F;--gold:#C8963E;--plaster:#F3EEE3;--terracotta:#B1523A;--ink:#1B2422;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--plaster);font-family:'Cairo',sans-serif;color:var(--ink);}
+  .app{max-width:420px;margin:0 auto;min-height:100vh;padding-bottom:40px;}
+  .topbar{position:sticky;top:0;background:var(--deep-teal);padding:16px 20px;display:flex;align-items:center;gap:12px;z-index:5;}
+  .topbar a{color:#fff;text-decoration:none;font-size:20px;display:flex;align-items:center;}
+  .topbar span{color:#fff;font-weight:700;font-size:14px;}
+  .content{padding:24px 20px;}
+  h1{font-family:'Tajawal',sans-serif;font-weight:900;font-size:20px;margin:0 0 6px;}
+  p.sub{font-size:13px;color:rgba(27,36,34,.6);margin:0 0 24px;}
+  label{display:block;font-size:12px;font-weight:700;margin:0 0 6px;}
+  input, textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,.12);font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:16px;background:#fff;}
+  textarea{min-height:130px;resize:vertical;}
+  button{cursor:pointer;border:0;border-radius:12px;font-weight:700;font-size:14px;padding:13px 18px;font-family:'Cairo',sans-serif;background:var(--deep-teal);color:#fff;width:100%;}
+  #status{font-size:13px;margin-top:12px;text-align:center;}
+  .success{background:#fff;border-radius:16px;padding:30px 20px;text-align:center;}
+  .success p{font-size:14px;color:rgba(27,36,34,.7);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a href="index.html">←</a>
+    <span>دليل الأجانب في تركيا</span>
+  </div>
+  <div class="content">
+    <div id="formWrap">
+      <h1>تواصل معنا</h1>
+      <p class="sub">اكتب سؤالك أو استفسارك وبنحاول نرد عليك بأقرب وقت.</p>
+
+      <label>الاسم</label>
+      <input id="cName" placeholder="اسمك" />
+
+      <label>وسيلة تواصل (واتساب أو إيميل)</label>
+      <input id="cContact" placeholder="مثال: رقم واتساب أو إيميل" />
+
+      <label>رسالتك</label>
+      <textarea id="cMessage" placeholder="اكتب سؤالك هنا..."></textarea>
+
+      <button onclick="sendMessage()">إرسال</button>
+      <p id="status"></p>
+    </div>
+    <div id="successWrap" style="display:none;" class="success">
+      <p style="font-size:18px;font-weight:700;color:var(--deep-teal);">تم إرسال رسالتك ✅</p>
+      <p>راح نتواصل معك بأقرب وقت ممكن.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function sendMessage() {
+    const name = document.getElementById("cName").value.trim();
+    const contact = document.getElementById("cContact").value.trim();
+    const message = document.getElementById("cMessage").value.trim();
+    const status = document.getElementById("status");
+
+    if (!message) {
+      status.innerText = "اكتب رسالتك على الأقل";
+      status.style.color = "#B1523A";
+      return;
+    }
+
+    db.collection("messages").add({
+      name, contact, message,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }).then(() => {
+      document.getElementById("formWrap").style.display = "none";
+      document.getElementById("successWrap").style.display = "block";
+    }).catch((e) => {
+      status.innerText = "تعذر الإرسال، حاول مرة أخرى";
+      status.style.color = "#B1523A";
+    });
+  }
+</script>
+</body>
+</html>

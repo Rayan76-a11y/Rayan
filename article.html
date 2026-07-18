@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>دليل الأجانب في تركيا</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0E3A3F" />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+  :root{--deep-teal:#0E3A3F;--gold:#C8963E;--plaster:#F3EEE3;--terracotta:#B1523A;--ink:#1B2422;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--plaster);font-family:'Cairo',sans-serif;color:var(--ink);}
+  .app{max-width:420px;margin:0 auto;min-height:100vh;padding-bottom:40px;}
+  .topbar{position:sticky;top:0;background:var(--deep-teal);padding:16px 20px;display:flex;align-items:center;gap:12px;z-index:5;}
+  .topbar a{color:#fff;text-decoration:none;font-size:20px;display:flex;align-items:center;}
+  .topbar span{color:#fff;font-weight:700;font-size:14px;}
+  .content{padding:24px 20px;}
+  .tag{font-size:11px;padding:3px 12px;border-radius:999px;background:rgba(14,58,63,.08);color:var(--deep-teal);font-weight:700;}
+  .mins{font-size:11px;color:rgba(27,36,34,.4);margin-right:8px;}
+  h1{font-family:'Tajawal',sans-serif;font-weight:900;font-size:22px;margin:16px 0 8px;line-height:1.4;}
+  .body-text{font-size:15px;line-height:2;white-space:pre-wrap;color:#2b2b2b;}
+  .loading, .error{padding:40px 20px;text-align:center;color:rgba(27,36,34,.5);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a href="index.html">←</a>
+    <span>دليل الأجانب في تركيا</span>
+  </div>
+  <div id="content" class="loading">جارِ التحميل...</div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  const el = document.getElementById("content");
+
+  if (!id) {
+    el.innerHTML = '<div class="error">لم يتم تحديد مقال</div>';
+  } else {
+    db.collection("articles").doc(id).get().then((doc) => {
+      if (!doc.exists) {
+        el.innerHTML = '<div class="error">هذا المقال لم يعد متاحًا</div>';
+        return;
+      }
+      const d = doc.data();
+      el.className = "content";
+      el.innerHTML = `
+        <span class="tag">${d.category || ""}</span>
+        <span class="mins">${d.minutes || ""}</span>
+        <h1>${d.title}</h1>
+        <div class="body-text">${(d.content || "").replace(/</g, "&lt;")}</div>
+      `;
+    }).catch(() => {
+      el.innerHTML = '<div class="error">تعذر تحميل المقال</div>';
+    });
+  }
+</script>
+</body>
+</html>

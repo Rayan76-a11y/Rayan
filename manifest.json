@@ -1,0 +1,17 @@
+{
+  "name": "دليل الأجانب في تركيا",
+  "short_name": "دليل الأجانب",
+  "description": "دليل شامل للأجانب في تركيا: الإقامة، العمل، السكن، الصحة والخدمات",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3EEE3",
+  "theme_color": "#0E3A3F",
+  "dir": "rtl",
+  "lang": "ar",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
