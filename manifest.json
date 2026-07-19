@@ -1,17 +1,33 @@
 {
-  "name": "دليل الأجانب في تركيا",
-  "short_name": "دليل الأجانب",
-  "description": "دليل شامل للأجانب في تركيا: الإقامة، العمل، السكن، الصحة والخدمات",
+  "name": "منصة متابعة المعاملات",
+  "short_name": "متابعة المعاملات",
+  "description": "تقديم طلبات الوثائق الرسمية ومتابعتها إلكترونيًا",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F3EEE3",
-  "theme_color": "#0E3A3F",
+  "background_color": "#F1EADC",
+  "theme_color": "#152238",
+  "orientation": "portrait",
   "dir": "rtl",
   "lang": "ar",
-  "orientation": "portrait",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

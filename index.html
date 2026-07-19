@@ -3,202 +3,812 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>دليل الأجانب في تركيا</title>
+<title>منصة متابعة المعاملات</title>
+<meta name="theme-color" content="#152238" />
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#0E3A3F" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="دليل الأجانب" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;900&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+<meta name="apple-mobile-web-app-title" content="متابعة المعاملات" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
-  :root{
-    --deep-teal:#0E3A3F;
-    --gold:#C8963E;
-    --plaster:#F3EEE3;
-    --terracotta:#B1523A;
-    --ink:#1B2422;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--plaster);font-family:'Cairo',sans-serif;color:var(--ink);}
-  .app{max-width:420px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:96px;}
-
-  .hero{position:relative;overflow:hidden;background:var(--deep-teal);border-radius:0 0 32px 32px;padding:32px 24px 32px;}
-  .hero svg{position:absolute;inset:0;width:100%;height:100%;opacity:.06;}
-  .hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;z-index:1;}
-  .eyebrow{color:var(--gold);font-size:12px;font-weight:700;margin:0 0 4px;}
-  .title{color:#fff;font-family:'Tajawal',sans-serif;font-weight:900;font-size:22px;margin:0;}
-  .avatar{width:44px;height:44px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .hero p.desc{color:rgba(255,255,255,.7);font-size:13px;line-height:1.7;margin:0 0 18px;position:relative;z-index:1;}
-  .search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:16px;padding:12px 16px;position:relative;z-index:1;}
-  .search input{border:0;background:transparent;outline:0;font-size:13px;flex:1;font-family:'Cairo',sans-serif;}
-
-  .section{padding:0 20px;margin-top:26px;}
-  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .section-head h2{font-size:16px;margin:0;font-weight:700;}
-  .link-small{color:var(--deep-teal);font-size:12px;font-weight:700;background:none;border:0;display:flex;align-items:center;gap:4px;cursor:pointer;}
-
-  .cats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-  .cat{background:#fff;border-radius:16px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid rgba(0,0,0,.04);cursor:pointer;}
-  .cat .icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;}
-  .cat .label{font-size:11px;font-weight:700;}
-  .cat .count{font-size:10px;color:rgba(27,36,34,.4);}
-
-  .articles{display:flex;flex-direction:column;gap:12px;}
-  .article{background:#fff;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;border:1px solid rgba(0,0,0,.04);}
-  .article .bar{width:5px;align-self:stretch;border-radius:8px;background:var(--gold);}
-  .article .txt{flex:1;}
-  .article .txt p{margin:0 0 6px;font-size:13px;font-weight:700;line-height:1.5;}
-  .tag{font-size:10px;padding:2px 10px;border-radius:999px;background:rgba(14,58,63,.06);color:var(--deep-teal);font-weight:700;}
-  .mins{font-size:10px;color:rgba(27,36,34,.4);margin-right:6px;}
-
-  .videos{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;}
-  .video{min-width:160px;background:var(--ink);border-radius:16px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;height:120px;flex-shrink:0;}
-  .play{width:32px;height:32px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;}
-  .video p{color:#fff;font-size:12px;font-weight:700;margin:0 0 4px;line-height:1.5;}
-  .video span{color:rgba(255,255,255,.4);font-size:10px;}
-
-  .help{background:var(--terracotta);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;}
-  .help .ic{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .help .txt{flex:1;color:#fff;}
-  .help .txt p:first-child{font-weight:700;font-size:13px;margin:0;}
-  .help .txt p:last-child{font-size:11px;opacity:.7;margin:2px 0 0;}
-  .help button{background:#fff;color:var(--terracotta);border:0;font-weight:700;font-size:12px;padding:8px 12px;border-radius:12px;}
-
-  .install-banner{margin:20px;background:var(--gold);border-radius:16px;padding:14px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;}
-  .install-banner.show{display:flex;}
-  .install-banner p{margin:0;font-size:12px;font-weight:700;color:var(--ink);}
-  .install-banner button{background:var(--ink);color:#fff;border:0;font-size:12px;font-weight:700;padding:8px 14px;border-radius:10px;}
-
-  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#fff;border-top:1px solid rgba(0,0,0,.06);padding:10px 24px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;border-radius:16px 16px 0 0;}
-  .nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(27,36,34,.5);font-size:10px;font-family:'Cairo',sans-serif;cursor:pointer;}
-  .nav button.active{color:var(--deep-teal);font-weight:700;}
+  body { font-family: 'IBM Plex Sans Arabic', sans-serif; margin:0; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin { animation: spin 2.2s linear infinite; }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="hero">
-    <svg><defs><pattern id="cini" width="46" height="46" patternUnits="userSpaceOnUse"><path d="M23 2 L40 23 L23 44 L6 23 Z" fill="none" stroke="#C8963E" stroke-width="1.4"/><circle cx="23" cy="23" r="4" fill="#C8963E"/></pattern></defs><rect width="100%" height="100%" fill="url(#cini)"/></svg>
-    <div class="hero-top">
-      <div>
-        <p class="eyebrow">دليلك اليومي</p>
-        <h1 class="title">دليل الأجانب في تركيا</h1>
-      </div>
-      <div class="avatar">👤</div>
-    </div>
-    <p class="desc">كل ما يحتاجه الأجانب في تركيا — إقامة، عمل، سكن وخدمات — في مكان واحد، مبني على تجربة القناة.</p>
-    <div class="search">
-      🔍 <input placeholder="ابحث عن إجراء، مدينة، أو موضوع..." />
-    </div>
-  </div>
-
-  <div id="installBanner" class="install-banner">
-    <p>ثبّت التطبيق على شاشتك الرئيسية</p>
-    <button id="installBtn">تثبيت</button>
-  </div>
-
-  <div class="section">
-    <div class="section-head"><h2>الأقسام</h2><button class="link-small">الكل ‹</button></div>
-    <div class="cats">
-      <div class="cat"><div class="icon" style="background:#0E3A3F1A;">📄</div><span class="label">الإقامة</span><span class="count">24 مقال</span></div>
-      <div class="cat"><div class="icon" style="background:#B1523A1A;">💼</div><span class="label">العمل</span><span class="count">18 مقال</span></div>
-      <div class="cat"><div class="icon" style="background:#C8963E1A;">🏠</div><span class="label">السكن</span><span class="count">15 مقال</span></div>
-      <div class="cat"><div class="icon" style="background:#0E3A3F1A;">➕</div><span class="label">الصحة</span><span class="count">9 مقالات</span></div>
-      <div class="cat"><div class="icon" style="background:#B1523A1A;">🎓</div><span class="label">التعليم</span><span class="count">11 مقال</span></div>
-      <div class="cat"><div class="icon" style="background:#C8963E1A;">🧭</div><span class="label">خدمات أخرى</span><span class="count">20 مقال</span></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head"><h2>أحدث الأدلة</h2><span style="font-size:10px;color:rgba(27,36,34,.4);">محدّث أسبوعيًا</span></div>
-    <div class="articles" id="articlesContainer">
-      <p style="font-size:12px;color:rgba(27,36,34,.5);">جارِ تحميل المقالات...</p>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head"><h2>من قناة اليوتيوب</h2></div>
-    <div class="videos" id="videosContainer">
-      <p style="font-size:12px;color:rgba(27,36,34,.5);">جارِ تحميل الفيديوهات...</p>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="help">
-      <div class="ic">📞</div>
-      <div class="txt"><p>عندك سؤال عاجل؟</p><p>اكتب رسالتك وبنرد عليك</p></div>
-      <a href="contact.html" style="text-decoration:none;"><button>تواصل</button></a>
-    </div>
-  </div>
-
-  <div class="nav">
-    <button class="active">🏠<span>الرئيسية</span></button>
-    <button>🧭<span>استكشف</span></button>
-    <button>🔖<span>المحفوظات</span></button>
-    <a href="admin.html" style="text-decoration:none;"><button>⚙️<span>الإدارة</span></button></a>
-  </div>
-</div>
+<div id="root"></div>
 
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch(() => {});
+  const firebaseConfig = {
+    apiKey: "AIzaSyASz_-3ZFYO3T9gJD79yP5fl2N-KmZlJEI",
+    authDomain: "mofa-4f7cf.firebaseapp.com",
+    projectId: "mofa-4f7cf",
+    storageBucket: "mofa-4f7cf.firebasestorage.app",
+    messagingSenderId: "68512076160",
+    appId: "1:68512076160:web:858588693ed0537f877165",
+  };
+  firebase.initializeApp(firebaseConfig);
+  window.__auth = firebase.auth();
+  window.__db = firebase.firestore();
+</script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback, useMemo } = React;
+const auth = window.__auth;
+const db = window.__db;
+
+const COLORS = {
+  navy: "#152238", sand: "#F1EADC", sandDeep: "#E4D9C3",
+  gold: "#A9823F", goldSoft: "#C9A768", olive: "#5C6B3F", rust: "#9C4438", ink: "#26241E",
+};
+
+const Icon = ({ path, size = 20, color = "currentColor", className = "", spin = false }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"
+    strokeLinecap="round" strokeLinejoin="round" className={(spin ? "spin " : "") + className}>{path}</svg>
+);
+const IconClock = (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></>} />;
+const IconLoader = (p) => <Icon {...p} path={<path d="M12 3a9 9 0 1 0 9 9"/>} />;
+const IconCheck = (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></>} />;
+const IconX = (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></>} />;
+const IconDoc = (p) => <Icon {...p} path={<><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></>} />;
+const IconUsers = (p) => <Icon {...p} path={<><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c2.2.3 4.5 1.9 4.5 5.5"/></>} />;
+const IconBadge = (p) => <Icon {...p} path={<><circle cx="12" cy="9" r="5"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></>} />;
+const IconSearch = (p) => <Icon {...p} path={<><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></>} />;
+const IconPlus = (p) => <Icon {...p} path={<path d="M12 5v14M5 12h14"/>} />;
+const IconChevron = (p) => <Icon {...p} path={<path d="M15 6l-6 6 6 6"/>} />;
+const IconUser = (p) => <Icon {...p} path={<><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></>} />;
+const IconShield = (p) => <Icon {...p} path={<><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/><path d="M9 12l2 2 4-4"/></>} />;
+const IconAlert = (p) => <Icon {...p} path={<><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.01"/></>} />;
+const IconBuilding = (p) => <Icon {...p} path={<><rect x="4" y="3" width="16" height="18"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h.01M15 16h.01"/></>} />;
+const IconTrash = (p) => <Icon {...p} path={<><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></>} />;
+const IconDash = (p) => <Icon {...p} path={<><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></>} />;
+
+const ICONS = { passport: IconDoc, id: IconBadge, family: IconUsers, generic: IconDash };
+
+const STATUS_STEPS = [
+  { id: "submitted", label: "تم الاستلام" },
+  { id: "under_review", label: "قيد المراجعة" },
+  { id: "approved", label: "تمت الموافقة" },
+  { id: "ready", label: "جاهز للاستلام" },
+];
+const STATUS_META = {
+  submitted: { label: "تم الاستلام", color: COLORS.gold, Icon: IconClock },
+  under_review: { label: "قيد المراجعة", color: COLORS.gold, Icon: IconLoader },
+  approved: { label: "تمت الموافقة", color: COLORS.olive, Icon: IconCheck },
+  ready: { label: "جاهز للاستلام", color: COLORS.olive, Icon: IconCheck },
+  rejected: { label: "مرفوض", color: COLORS.rust, Icon: IconX },
+};
+
+const DEFAULT_SERVICES = [
+  { name: "جواز السفر", active: true, iconKey: "passport", subtypes: [
+      { id: "first_time", label: "استخراج جواز سفر لأول مرة" },
+      { id: "renew", label: "تجديد جواز سفر" },
+    ] },
+  { name: "الهوية الشخصية", active: true, iconKey: "id", subtypes: [
+      { id: "first_time", label: "استخراج هوية شخصية لأول مرة" },
+      { id: "renew", label: "تجديد الهوية الشخصية" },
+      { id: "lost", label: "بدل عن هوية مفقودة أو تالفة" },
+    ] },
+  { name: "قيد عائلي", active: true, iconKey: "family", subtypes: [
+      { id: "extract", label: "استخراج نسخة عن القيد العائلي" },
+      { id: "update", label: "تحديث بيانات القيد (ولادة / زواج / وفاة)" },
+    ] },
+];
+
+function fmtDate(iso){ try { return new Date(iso).toLocaleString("ar-SY",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}); } catch { return iso; } }
+function trackingCode(id){ return "REQ-" + id.slice(-6).toUpperCase(); }
+
+function OfficialStamp({ status, size = 64 }) {
+  const meta = STATUS_META[status] || STATUS_META.submitted;
+  const { Icon: I } = meta;
+  return (
+    <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
+      <div className="absolute inset-0 rounded-full" style={{ border: `2.5px solid ${meta.color}`, boxShadow: `0 0 0 3px ${meta.color}22 inset`, transform: "rotate(-8deg)" }} />
+      <div className="absolute rounded-full" style={{ inset: 5, border: `1px dashed ${meta.color}99`, transform: "rotate(-8deg)" }} />
+      <I size={size * 0.34} color={meta.color} spin={status === "under_review"} />
+    </div>
+  );
+}
+function StatusPill({ status }) {
+  const meta = STATUS_META[status] || STATUS_META.submitted;
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold" style={{ backgroundColor: `${meta.color}1A`, color: meta.color }}>
+      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: meta.color }} />{meta.label}
+    </span>
+  );
+}
+function TopBar({ title, subtitle, onBack, right }) {
+  return (
+    <div className="sticky top-0 z-10 px-5 py-4 flex items-center justify-between" style={{ backgroundColor: COLORS.navy }}>
+      <div className="flex items-center gap-3">
+        {onBack && (<button onClick={onBack} className="p-1.5 rounded-lg" style={{ backgroundColor: "#ffffff15" }}><IconChevron size={18} color="white" style={{ transform: "scaleX(-1)" }} /></button>)}
+        <div>
+          <div style={{ fontFamily: "Cairo", color: "white" }} className="font-bold text-sm">{title}</div>
+          {subtitle && <div className="text-xs" style={{ color: "#F1EADC99" }}>{subtitle}</div>}
+        </div>
+      </div>
+      {right}
+    </div>
+  );
+}
+function Row({ label, value }) {
+  return (
+    <div className="flex justify-between py-1.5 border-b" style={{ borderColor: `${COLORS.sandDeep}80` }}>
+      <span className="opacity-60" style={{ color: COLORS.ink }}>{label}</span>
+      <span className="font-semibold" style={{ color: COLORS.navy }}>{value || "—"}</span>
+    </div>
+  );
+}
+
+function EntryGate({ onCitizenEnter, onStaffLogin, staffError, staffBusy }) {
+  const [mode, setMode] = useState(null);
+  const [name, setName] = useState("");
+  const [nationalId, setNationalId] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  if (mode === "citizen") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: COLORS.sand }}>
+        <div className="w-full max-w-md">
+          <button onClick={() => setMode(null)} className="mb-4 text-sm flex items-center gap-1" style={{ color: COLORS.navy }}>
+            <IconChevron size={16} style={{ transform: "scaleX(-1)" }} /> رجوع
+          </button>
+          <h1 style={{ fontFamily: "Cairo", color: COLORS.navy }} className="text-xl font-extrabold mb-4">بيانات المواطن</h1>
+          <div className="space-y-2.5 mb-5">
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="الاسم الكامل"
+              className="w-full rounded-xl border px-4 py-3 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+            <input value={nationalId} onChange={(e) => setNationalId(e.target.value)} placeholder="الرقم الوطني"
+              className="w-full rounded-xl border px-4 py-3 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+          </div>
+          <button disabled={!name.trim() || !nationalId.trim()} onClick={() => onCitizenEnter({ name: name.trim(), nationalId: nationalId.trim() })}
+            className="w-full py-3.5 rounded-xl font-bold text-sm" style={{ backgroundColor: COLORS.gold, color: "white", fontFamily: "Cairo", opacity: name.trim() && nationalId.trim() ? 1 : 0.45 }}>
+            متابعة
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "staff") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: COLORS.sand }}>
+        <div className="w-full max-w-md">
+          <button onClick={() => setMode(null)} className="mb-4 text-sm flex items-center gap-1" style={{ color: COLORS.navy }}>
+            <IconChevron size={16} style={{ transform: "scaleX(-1)" }} /> رجوع
+          </button>
+          <h1 style={{ fontFamily: "Cairo", color: COLORS.navy }} className="text-xl font-extrabold mb-4">دخول الموظفين والإدارة</h1>
+          <div className="space-y-2.5 mb-3">
+            <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="البريد الإلكتروني" type="email"
+              className="w-full rounded-xl border px-4 py-3 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+            <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="كلمة المرور" type="password"
+              className="w-full rounded-xl border px-4 py-3 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+          </div>
+          {staffError && <div className="text-xs mb-3 p-2.5 rounded-lg" style={{ backgroundColor: `${COLORS.rust}14`, color: COLORS.rust }}>{staffError}</div>}
+          <button disabled={!email.trim() || !password || staffBusy} onClick={() => onStaffLogin(email.trim(), password)}
+            className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2" style={{ backgroundColor: COLORS.navy, color: "white", fontFamily: "Cairo", opacity: email.trim() && password && !staffBusy ? 1 : 0.45 }}>
+            {staffBusy ? <IconLoader spin size={16} color="white" /> : "دخول"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: COLORS.sand }}>
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="mx-auto mb-4 flex items-center justify-center rounded-2xl" style={{ width: 64, height: 64, backgroundColor: COLORS.navy }}>
+            <IconBuilding color={COLORS.goldSoft} size={30} />
+          </div>
+          <h1 style={{ fontFamily: "Cairo", color: COLORS.navy }} className="text-2xl font-extrabold">منصة متابعة المعاملات</h1>
+          <p style={{ color: COLORS.ink }} className="text-sm mt-1 opacity-70">تقديم طلبات الوثائق الرسمية ومتابعتها إلكترونيًا</p>
+        </div>
+        <div className="space-y-2">
+          <button onClick={() => setMode("citizen")} className="w-full flex items-center gap-3 p-3.5 rounded-xl border text-right bg-white" style={{ borderColor: COLORS.sandDeep }}>
+            <div className="rounded-lg p-2" style={{ backgroundColor: COLORS.sand }}><IconUser size={20} color={COLORS.navy} /></div>
+            <div>
+              <div className="font-bold text-sm" style={{ fontFamily: "Cairo", color: COLORS.navy }}>مواطن</div>
+              <div className="text-xs mt-0.5 opacity-60" style={{ color: COLORS.ink }}>تقديم طلب ومتابعة حالته</div>
+            </div>
+          </button>
+          <button onClick={() => setMode("staff")} className="w-full flex items-center gap-3 p-3.5 rounded-xl border text-right bg-white" style={{ borderColor: COLORS.sandDeep }}>
+            <div className="rounded-lg p-2" style={{ backgroundColor: COLORS.sand }}><IconShield size={20} color={COLORS.navy} /></div>
+            <div>
+              <div className="font-bold text-sm" style={{ fontFamily: "Cairo", color: COLORS.navy }}>موظف / إدارة</div>
+              <div className="text-xs mt-0.5 opacity-60" style={{ color: COLORS.ink }}>تسجيل الدخول بالبريد وكلمة المرور</div>
+            </div>
+          </button>
+        </div>
+        <p className="text-center text-xs mt-5 opacity-50" style={{ color: COLORS.ink }}>نسخة تجريبية — بيانات حقيقية على مسؤوليتك</p>
+      </div>
+    </div>
+  );
+}
+
+function NewRequestForm({ services, onSubmit, onCancel }) {
+  const activeServices = services.filter((s) => s.active);
+  const [serviceId, setServiceId] = useState(activeServices[0]?.id);
+  const service = services.find((s) => s.id === serviceId);
+  const [subtype, setSubtype] = useState(service?.subtypes[0]?.id);
+  const [phone, setPhone] = useState("");
+  const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => { if (service && !service.subtypes.find((s) => s.id === subtype)) setSubtype(service.subtypes[0]?.id); }, [serviceId]);
+
+  const submit = async () => { setSubmitting(true); await onSubmit({ serviceId, subtype, phone, notes }); setSubmitting(false); };
+  if (!service) return <div className="p-5 text-sm opacity-60">لا توجد خدمات مفعّلة حاليًا.</div>;
+  return (
+    <div className="p-5 space-y-4">
+      <div>
+        <label className="text-xs font-semibold opacity-70" style={{ color: COLORS.ink }}>المعاملة</label>
+        <div className="grid grid-cols-1 gap-2 mt-2">
+          {activeServices.map((s) => {
+            const I = ICONS[s.iconKey] || IconDash; const active = serviceId === s.id;
+            return (
+              <button key={s.id} onClick={() => setServiceId(s.id)} className="flex items-center gap-2.5 text-right px-4 py-3 rounded-xl border text-sm font-medium"
+                style={{ borderColor: active ? COLORS.navy : COLORS.sandDeep, backgroundColor: active ? COLORS.navy : "white", color: active ? "white" : COLORS.navy }}>
+                <I size={16} color={active ? COLORS.goldSoft : COLORS.navy} />{s.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div>
+        <label className="text-xs font-semibold opacity-70" style={{ color: COLORS.ink }}>نوع الطلب</label>
+        <div className="grid grid-cols-1 gap-2 mt-2">
+          {service.subtypes.map((st) => (
+            <button key={st.id} onClick={() => setSubtype(st.id)} className="text-right px-4 py-3 rounded-xl border text-sm font-medium"
+              style={{ borderColor: subtype === st.id ? COLORS.gold : COLORS.sandDeep, backgroundColor: subtype === st.id ? `${COLORS.gold}14` : "white", color: COLORS.navy }}>
+              {st.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="text-xs font-semibold opacity-70" style={{ color: COLORS.ink }}>رقم الهاتف للتواصل</label>
+        <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="09xxxxxxxx"
+          className="w-full mt-2 rounded-xl border px-4 py-3 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+      </div>
+      <div>
+        <label className="text-xs font-semibold opacity-70" style={{ color: COLORS.ink }}>ملاحظات إضافية (اختياري)</label>
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3}
+          className="w-full mt-2 rounded-xl border px-4 py-3 text-sm outline-none resize-none" style={{ borderColor: COLORS.sandDeep }} />
+      </div>
+      <div className="flex gap-2 pt-2">
+        <button onClick={onCancel} className="flex-1 py-3 rounded-xl text-sm font-semibold" style={{ backgroundColor: COLORS.sandDeep, color: COLORS.navy, fontFamily: "Cairo" }}>إلغاء</button>
+        <button onClick={submit} disabled={!phone.trim() || submitting} className="flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
+          style={{ backgroundColor: COLORS.navy, color: "white", fontFamily: "Cairo", opacity: phone.trim() && !submitting ? 1 : 0.5 }}>
+          {submitting ? <IconLoader spin size={16} color="white" /> : "تقديم الطلب"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function RequestDetail({ request, services, isEmployee, onUpdateStatus }) {
+  const [note, setNote] = useState("");
+  const currentIdx = STATUS_STEPS.findIndex((s) => s.id === request.status);
+  const rejected = request.status === "rejected";
+  const service = services.find((s) => s.id === request.serviceId);
+  const subtype = service?.subtypes.find((s) => s.id === request.subtype);
+  return (
+    <div className="p-5 space-y-5">
+      <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ backgroundColor: COLORS.sand }}>
+        <OfficialStamp status={request.status} />
+        <div>
+          <div className="text-xs opacity-60" style={{ color: COLORS.ink }}>رقم التتبع</div>
+          <div style={{ fontFamily: "Cairo", color: COLORS.navy }} className="font-extrabold text-lg tracking-wide">{trackingCode(request.id)}</div>
+          <StatusPill status={request.status} />
+        </div>
+      </div>
+      <div className="space-y-2 text-sm">
+        <Row label="الخدمة" value={`${service?.name || "—"} — ${subtype?.label || "—"}`} />
+        <Row label="مقدّم الطلب" value={request.applicantName} />
+        <Row label="الرقم الوطني" value={request.nationalId} />
+        <Row label="الهاتف" value={request.phone} />
+        <Row label="تاريخ التقديم" value={fmtDate(request.submittedAt)} />
+      </div>
+      {!rejected ? (
+        <div>
+          <div className="text-xs font-semibold opacity-70 mb-3" style={{ color: COLORS.ink }}>مراحل المعاملة</div>
+          {STATUS_STEPS.map((step, i) => {
+            const done = i <= currentIdx;
+            return (
+              <div key={step.id} className="flex gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: done ? COLORS.olive : COLORS.sandDeep }} />
+                  {i < STATUS_STEPS.length - 1 && <div className="w-0.5 flex-1" style={{ backgroundColor: done ? COLORS.olive : COLORS.sandDeep, minHeight: 22 }} />}
+                </div>
+                <div className="pb-5 -mt-0.5 text-sm" style={{ color: done ? COLORS.navy : "#26241E66", fontWeight: done ? 600 : 400 }}>{step.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="p-3 rounded-xl text-sm flex items-start gap-2" style={{ backgroundColor: `${COLORS.rust}14`, color: COLORS.rust }}>
+          <IconAlert size={16} className="mt-0.5 shrink-0" />تم رفض الطلب. راجع الملاحظات أدناه أو تواصل مع الموظف المختص.
+        </div>
+      )}
+      {(request.history || []).length > 0 && (
+        <div>
+          <div className="text-xs font-semibold opacity-70 mb-2" style={{ color: COLORS.ink }}>سجل الملاحظات</div>
+          <div className="space-y-2">
+            {request.history.map((h, i) => (
+              <div key={i} className="text-xs p-2.5 rounded-lg" style={{ backgroundColor: COLORS.sand, color: COLORS.ink }}>
+                <div className="flex justify-between mb-1 opacity-60"><span>{STATUS_META[h.status]?.label}</span><span>{fmtDate(h.at)}</span></div>
+                {h.note && <div>{h.note}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {isEmployee && !rejected && request.status !== "ready" && (
+        <div className="pt-2 border-t" style={{ borderColor: COLORS.sandDeep }}>
+          <div className="text-xs font-semibold opacity-70 mb-2 mt-3" style={{ color: COLORS.ink }}>تحديث الحالة</div>
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="ملاحظة (اختياري)" rows={2}
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none resize-none mb-2" style={{ borderColor: COLORS.sandDeep }} />
+          <div className="grid grid-cols-2 gap-2">
+            {currentIdx < STATUS_STEPS.length - 1 && (
+              <button onClick={() => onUpdateStatus(STATUS_STEPS[currentIdx + 1].id, note)} className="py-2.5 rounded-xl text-xs font-bold" style={{ backgroundColor: COLORS.olive, color: "white", fontFamily: "Cairo" }}>
+                نقل إلى: {STATUS_STEPS[currentIdx + 1].label}
+              </button>
+            )}
+            <button onClick={() => onUpdateStatus("rejected", note)} className="py-2.5 rounded-xl text-xs font-bold" style={{ backgroundColor: `${COLORS.rust}14`, color: COLORS.rust, fontFamily: "Cairo" }}>رفض الطلب</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CitizenApp({ citizen, uid, services, addRequest, onExit }) {
+  const [view, setView] = useState("list");
+  const [selectedId, setSelectedId] = useState(null);
+  const [requests, setRequests] = useState([]);
+  useEffect(() => db.collection("requests").where("citizenUid", "==", uid).onSnapshot((snap) => setRequests(snap.docs.map((d) => ({ id: d.id, ...d.data() })))), [uid]);
+  const selected = requests.find((r) => r.id === selectedId);
+
+  if (view === "new") {
+    return (
+      <div style={{ backgroundColor: "white", minHeight: "100vh" }}>
+        <TopBar title="تقديم طلب جديد" subtitle={citizen.name} onBack={() => setView("list")} />
+        <NewRequestForm services={services} onCancel={() => setView("list")}
+          onSubmit={async (data) => { const id = await addRequest({ ...data, applicantName: citizen.name, nationalId: citizen.nationalId }); setSelectedId(id); setView("detail"); }} />
+      </div>
+    );
+  }
+  if (view === "detail" && selected) {
+    return (
+      <div style={{ backgroundColor: "white", minHeight: "100vh" }}>
+        <TopBar title="تفاصيل الطلب" subtitle={trackingCode(selected.id)} onBack={() => setView("list")} />
+        <RequestDetail request={selected} services={services} isEmployee={false} />
+      </div>
+    );
+  }
+  return (
+    <div style={{ backgroundColor: COLORS.sand, minHeight: "100vh" }}>
+      <TopBar title={`أهلًا، ${citizen.name}`} subtitle="طلباتي"
+        right={<button onClick={onExit} className="text-xs px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#ffffff15", color: "white" }}>خروج</button>} />
+      <div className="p-5">
+        <button onClick={() => setView("new")} className="w-full mb-5 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2" style={{ backgroundColor: COLORS.navy, color: "white", fontFamily: "Cairo" }}>
+          <IconPlus size={16} color="white" /> تقديم طلب جديد
+        </button>
+        {requests.length === 0 ? (
+          <div className="text-center py-12 opacity-50 text-sm" style={{ color: COLORS.ink }}>لا توجد طلبات حتى الآن</div>
+        ) : (
+          <div className="space-y-3">
+            {requests.slice().reverse().map((r) => (
+              <button key={r.id} onClick={() => { setSelectedId(r.id); setView("detail"); }} className="w-full flex items-center gap-3 p-4 rounded-2xl bg-white text-right">
+                <OfficialStamp status={r.status} size={48} />
+                <div className="flex-1">
+                  <div style={{ fontFamily: "Cairo", color: COLORS.navy }} className="font-bold text-sm">{services.find((s) => s.id === r.serviceId)?.subtypes.find((s) => s.id === r.subtype)?.label}</div>
+                  <div className="text-xs opacity-50 mt-0.5" style={{ color: COLORS.ink }}>{trackingCode(r.id)} · {fmtDate(r.submittedAt)}</div>
+                  <div className="mt-1.5"><StatusPill status={r.status} /></div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EmployeeApp({ services, onExit }) {
+  const [requests, setRequests] = useState([]);
+  const [filter, setFilter] = useState("all");
+  const [serviceFilter, setServiceFilter] = useState("all");
+  const [q, setQ] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
+  useEffect(() => db.collection("requests").onSnapshot((snap) => setRequests(snap.docs.map((d) => ({ id: d.id, ...d.data() })))), []);
+  const selected = requests.find((r) => r.id === selectedId);
+  const activeServices = services.filter((s) => s.active);
+
+  const updateStatus = async (id, status, note) => {
+    await db.collection("requests").doc(id).update({
+      status,
+      history: firebase.firestore.FieldValue.arrayUnion({ status, at: new Date().toISOString(), note: note || "" }),
     });
-  }
-  function loadArticles() {
-    const el = document.getElementById("articlesContainer");
-    db.collection("articles").orderBy("createdAt", "desc").limit(10).get().then((snap) => {
-      if (snap.empty) { el.innerHTML = "<p style='font-size:12px;color:rgba(27,36,34,.5);'>لا يوجد مقالات بعد</p>"; return; }
-      el.innerHTML = "";
-      snap.forEach((doc) => {
-        const d = doc.data();
-        el.innerHTML += `<a href="article.html?id=${doc.id}" style="text-decoration:none;color:inherit;"><div class="article"><div class="bar"></div><div class="txt"><p>${d.title}</p><span class="tag">${d.category || ""}</span><span class="mins">${d.minutes || ""}</span></div>›</div></a>`;
-      });
-    }).catch(() => { el.innerHTML = "<p style='font-size:12px;color:rgba(27,36,34,.5);'>تعذر تحميل المقالات</p>"; });
-  }
+  };
 
-  function getYoutubeId(url) {
-    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
-    return m ? m[1] : null;
-  }
-
-  function loadVideos() {
-    const el = document.getElementById("videosContainer");
-    db.collection("videos").orderBy("createdAt", "desc").limit(10).get().then((snap) => {
-      if (snap.empty) { el.innerHTML = "<p style='font-size:12px;color:rgba(27,36,34,.5);'>لا يوجد فيديوهات بعد</p>"; return; }
-      el.innerHTML = "";
-      snap.forEach((doc) => {
-        const d = doc.data();
-        const vid = getYoutubeId(d.url || "");
-        const thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : "";
-        const bg = thumb ? `style="background-image:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15)),url('${thumb}');background-size:cover;background-position:center;"` : "";
-        el.innerHTML += `<a href="${d.url}" target="_blank" style="text-decoration:none;"><div class="video" ${bg}><div class="play">▶</div><div><p>${d.title}</p><span>${d.views || ""}</span></div></div></a>`;
-      });
-    }).catch(() => { el.innerHTML = "<p style='font-size:12px;color:rgba(27,36,34,.5);'>تعذر تحميل الفيديوهات</p>"; });
-  }
-
-  loadArticles();
-  loadVideos();
-
-  let deferredPrompt;
-  const banner = document.getElementById("installBanner");
-  const btn = document.getElementById("installBtn");
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    banner.classList.add("show");
+  const filtered = requests.filter((r) => {
+    const mf = filter === "all" || r.status === filter;
+    const ms = serviceFilter === "all" || r.serviceId === serviceFilter;
+    const mq = !q || r.applicantName?.includes(q) || r.nationalId?.includes(q) || trackingCode(r.id).toLowerCase().includes(q.toLowerCase());
+    return mf && ms && mq;
   });
-  btn && btn.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    banner.classList.remove("show");
-  });
+
+  if (selected) {
+    return (
+      <div style={{ backgroundColor: "white", minHeight: "100vh" }}>
+        <TopBar title="مراجعة الطلب" subtitle={trackingCode(selected.id)} onBack={() => setSelectedId(null)} />
+        <RequestDetail request={selected} services={services} isEmployee onUpdateStatus={(status, note) => { updateStatus(selected.id, status, note); setSelectedId(null); }} />
+      </div>
+    );
+  }
+  return (
+    <div style={{ backgroundColor: COLORS.sand, minHeight: "100vh" }}>
+      <TopBar title="لوحة الموظف" subtitle={`${requests.length} طلب إجمالاً`}
+        right={<button onClick={onExit} className="text-xs px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#ffffff15", color: "white" }}>خروج</button>} />
+      <div className="p-5">
+        <div className="relative mb-3">
+          <IconSearch size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 opacity-40" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="بحث بالاسم أو الرقم الوطني أو رقم التتبع"
+            className="w-full rounded-xl border pr-10 pl-4 py-3 text-sm outline-none" style={{ borderColor: COLORS.sandDeep, backgroundColor: "white" }} />
+        </div>
+        <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
+          {[{ id: "all", name: "كل المعاملات" }, ...activeServices].map((s) => (
+            <button key={s.id} onClick={() => setServiceFilter(s.id)} className="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0"
+              style={{ backgroundColor: serviceFilter === s.id ? COLORS.gold : "white", color: serviceFilter === s.id ? "white" : COLORS.navy, fontFamily: "Cairo" }}>{s.name}</button>
+          ))}
+        </div>
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+          {["all", "submitted", "under_review", "approved", "ready", "rejected"].map((f) => (
+            <button key={f} onClick={() => setFilter(f)} className="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0"
+              style={{ backgroundColor: filter === f ? COLORS.navy : "white", color: filter === f ? "white" : COLORS.navy, fontFamily: "Cairo" }}>
+              {f === "all" ? "الكل" : STATUS_META[f].label}
+            </button>
+          ))}
+        </div>
+        {filtered.length === 0 ? (
+          <div className="text-center py-12 opacity-50 text-sm" style={{ color: COLORS.ink }}>لا توجد نتائج مطابقة</div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.slice().reverse().map((r) => (
+              <button key={r.id} onClick={() => setSelectedId(r.id)} className="w-full flex items-center gap-3 p-4 rounded-2xl bg-white text-right">
+                <OfficialStamp status={r.status} size={44} />
+                <div className="flex-1">
+                  <div style={{ fontFamily: "Cairo", color: COLORS.navy }} className="font-bold text-sm">{r.applicantName}</div>
+                  <div className="text-xs opacity-50 mt-0.5" style={{ color: COLORS.ink }}>{trackingCode(r.id)} · {services.find((s) => s.id === r.serviceId)?.subtypes.find((s) => s.id === r.subtype)?.label}</div>
+                  <div className="mt-1.5"><StatusPill status={r.status} /></div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AccountsPanel() {
+  const [users, setUsers] = useState([]);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("employee");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  useEffect(() => db.collection("users").onSnapshot((snap) => setUsers(snap.docs.map((d) => ({ uid: d.id, ...d.data() })))), []);
+
+  const createAccount = async () => {
+    setErr(""); setBusy(true);
+    try {
+      const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary-" + Date.now());
+      const cred = await secondaryApp.auth().createUserWithEmailAndPassword(email.trim(), password);
+      await db.collection("users").doc(cred.user.uid).set({ email: email.trim(), role, createdAt: new Date().toISOString() });
+      await secondaryApp.auth().signOut();
+      await secondaryApp.delete();
+      setEmail(""); setPassword("");
+    } catch (e) {
+      setErr(e.message || "تعذّر إنشاء الحساب");
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="p-4 rounded-2xl bg-white">
+        <div className="text-sm font-bold mb-3" style={{ fontFamily: "Cairo", color: COLORS.navy }}>إضافة حساب جديد</div>
+        <div className="space-y-2.5">
+          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="البريد الإلكتروني" type="email"
+            className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+          <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="كلمة مرور (6 أحرف على الأقل)" type="text"
+            className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+          <div className="grid grid-cols-2 gap-2">
+            {["employee", "admin"].map((r) => (
+              <button key={r} onClick={() => setRole(r)} className="py-2.5 rounded-xl text-sm font-semibold"
+                style={{ backgroundColor: role === r ? COLORS.navy : COLORS.sand, color: role === r ? "white" : COLORS.navy, fontFamily: "Cairo" }}>
+                {r === "employee" ? "موظف" : "إدارة"}
+              </button>
+            ))}
+          </div>
+          {err && <div className="text-xs p-2 rounded-lg" style={{ backgroundColor: `${COLORS.rust}14`, color: COLORS.rust }}>{err}</div>}
+          <button onClick={createAccount} disabled={!email.trim() || password.length < 6 || busy}
+            className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+            style={{ backgroundColor: COLORS.gold, color: "white", fontFamily: "Cairo", opacity: email.trim() && password.length >= 6 && !busy ? 1 : 0.5 }}>
+            {busy ? <IconLoader spin size={16} color="white" /> : "إنشاء الحساب"}
+          </button>
+        </div>
+      </div>
+      <div className="p-4 rounded-2xl bg-white">
+        <div className="text-sm font-bold mb-3" style={{ fontFamily: "Cairo", color: COLORS.navy }}>الحسابات الحالية ({users.length})</div>
+        {users.length === 0 ? (
+          <div className="text-xs opacity-50 py-4 text-center" style={{ color: COLORS.ink }}>لا توجد حسابات مسجّلة بعد في قاعدة البيانات</div>
+        ) : (
+          <div className="space-y-2">
+            {users.map((u) => (
+              <div key={u.uid} className="flex items-center justify-between p-2.5 rounded-xl" style={{ backgroundColor: COLORS.sand }}>
+                <div className="text-sm font-medium" style={{ color: COLORS.navy }}>{u.email}</div>
+                <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ backgroundColor: `${COLORS.olive}1A`, color: COLORS.olive }}>{u.role === "admin" ? "إدارة" : "موظف"}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ServicesPanel({ services }) {
+  const [newName, setNewName] = useState("");
+  const [newIcon, setNewIcon] = useState("generic");
+  const [subtypeDrafts, setSubtypeDrafts] = useState({});
+
+  const toggleActive = (s) => db.collection("services").doc(s.id).update({ active: !s.active });
+  const addSubtype = (s) => {
+    const label = (subtypeDrafts[s.id] || "").trim();
+    if (!label) return;
+    db.collection("services").doc(s.id).update({ subtypes: firebase.firestore.FieldValue.arrayUnion({ id: "st_" + Date.now(), label }) });
+    setSubtypeDrafts((d) => ({ ...d, [s.id]: "" }));
+  };
+  const removeSubtype = (s, st) => db.collection("services").doc(s.id).update({ subtypes: firebase.firestore.FieldValue.arrayRemove(st) });
+  const addService = async () => {
+    if (!newName.trim()) return;
+    await db.collection("services").add({ name: newName.trim(), active: true, iconKey: newIcon, subtypes: [] });
+    setNewName("");
+  };
+
+  return (
+    <div className="space-y-4">
+      {services.map((s) => {
+        const I = ICONS[s.iconKey] || IconDash;
+        return (
+          <div key={s.id} className="p-4 rounded-2xl bg-white">
+            <div className="flex items-center gap-3 mb-3">
+              <I size={18} color={COLORS.navy} />
+              <div className="flex-1 font-bold text-sm" style={{ fontFamily: "Cairo", color: COLORS.navy }}>{s.name}</div>
+              <button onClick={() => toggleActive(s)} className="text-xs px-3 py-1.5 rounded-full font-semibold"
+                style={{ backgroundColor: s.active ? `${COLORS.olive}1A` : "#26241E14", color: s.active ? COLORS.olive : "#26241E77" }}>
+                {s.active ? "مفعّلة" : "معطّلة"}
+              </button>
+            </div>
+            <div className="space-y-1.5 mb-3">
+              {s.subtypes.map((st) => (
+                <div key={st.id} className="flex items-center justify-between text-xs p-2 rounded-lg" style={{ backgroundColor: COLORS.sand, color: COLORS.ink }}>
+                  <span>{st.label}</span>
+                  <button onClick={() => removeSubtype(s, st)}><IconTrash size={14} color={COLORS.rust} /></button>
+                </div>
+              ))}
+              {s.subtypes.length === 0 && <div className="text-xs opacity-50 py-1" style={{ color: COLORS.ink }}>لا توجد أنواع طلبات بعد</div>}
+            </div>
+            <div className="flex gap-2">
+              <input value={subtypeDrafts[s.id] || ""} onChange={(e) => setSubtypeDrafts((d) => ({ ...d, [s.id]: e.target.value }))}
+                placeholder="إضافة نوع طلب جديد" className="flex-1 rounded-lg border px-3 py-2 text-xs outline-none" style={{ borderColor: COLORS.sandDeep }} />
+              <button onClick={() => addSubtype(s)} className="px-3 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: COLORS.navy, color: "white" }}>إضافة</button>
+            </div>
+          </div>
+        );
+      })}
+      <div className="p-4 rounded-2xl bg-white">
+        <div className="text-sm font-bold mb-3" style={{ fontFamily: "Cairo", color: COLORS.navy }}>إضافة معاملة جديدة</div>
+        <div className="flex gap-2 mb-2">
+          {Object.entries(ICONS).map(([key, I]) => (
+            <button key={key} onClick={() => setNewIcon(key)} className="p-2.5 rounded-xl border" style={{ borderColor: newIcon === key ? COLORS.gold : COLORS.sandDeep, backgroundColor: newIcon === key ? `${COLORS.gold}14` : "white" }}>
+              <I size={18} color={COLORS.navy} />
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="اسم المعاملة (مثال: رخصة القيادة)"
+            className="flex-1 rounded-xl border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.sandDeep }} />
+          <button onClick={addService} disabled={!newName.trim()} className="px-4 rounded-xl text-sm font-bold" style={{ backgroundColor: COLORS.gold, color: "white", opacity: newName.trim() ? 1 : 0.5 }}>+</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminApp({ services, onExit }) {
+  const [tab, setTab] = useState("overview");
+  const [requests, setRequests] = useState([]);
+  useEffect(() => db.collection("requests").onSnapshot((snap) => setRequests(snap.docs.map((d) => ({ id: d.id, ...d.data() })))), []);
+
+  const stats = useMemo(() => {
+    const byStatus = {}; STATUS_STEPS.concat([{ id: "rejected" }]).forEach((s) => (byStatus[s.id] = 0));
+    requests.forEach((r) => (byStatus[r.status] = (byStatus[r.status] || 0) + 1));
+    const byService = {}; requests.forEach((r) => { byService[r.serviceId] = (byService[r.serviceId] || 0) + 1; });
+    return { byStatus, byService, total: requests.length };
+  }, [requests]);
+  const maxStatus = Math.max(1, ...Object.values(stats.byStatus));
+  const maxService = Math.max(1, ...Object.values(stats.byService), 1);
+
+  const tabs = [
+    { id: "overview", label: "نظرة عامة" },
+    { id: "services", label: "الخدمات" },
+    { id: "accounts", label: "الحسابات" },
+  ];
+
+  return (
+    <div style={{ backgroundColor: COLORS.sand, minHeight: "100vh" }}>
+      <TopBar title="لوحة الإدارة العامة" subtitle="التحكم الكامل بالنظام"
+        right={<button onClick={onExit} className="text-xs px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#ffffff15", color: "white" }}>خروج</button>} />
+      <div className="px-5 pt-4 flex gap-2">
+        {tabs.map((t) => (
+          <button key={t.id} onClick={() => setTab(t.id)} className="flex-1 py-2.5 rounded-xl text-xs font-bold"
+            style={{ backgroundColor: tab === t.id ? COLORS.navy : "white", color: tab === t.id ? "white" : COLORS.navy, fontFamily: "Cairo" }}>{t.label}</button>
+        ))}
+      </div>
+      <div className="p-5 space-y-5">
+        {tab === "overview" && (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-4 rounded-2xl bg-white">
+                <div className="text-xs opacity-50" style={{ color: COLORS.ink }}>إجمالي الطلبات</div>
+                <div style={{ fontFamily: "Cairo", color: COLORS.navy }} className="text-3xl font-extrabold mt-1">{stats.total}</div>
+              </div>
+              <div className="p-4 rounded-2xl bg-white">
+                <div className="text-xs opacity-50" style={{ color: COLORS.ink }}>جاهزة للاستلام</div>
+                <div style={{ fontFamily: "Cairo", color: COLORS.olive }} className="text-3xl font-extrabold mt-1">{stats.byStatus.ready || 0}</div>
+              </div>
+            </div>
+            <div className="p-4 rounded-2xl bg-white">
+              <div className="text-sm font-bold mb-4" style={{ fontFamily: "Cairo", color: COLORS.navy }}>توزيع الطلبات حسب الحالة</div>
+              <div className="space-y-3">
+                {STATUS_STEPS.concat([{ id: "rejected", label: "مرفوض" }]).map((s) => {
+                  const val = stats.byStatus[s.id] || 0; const meta = STATUS_META[s.id];
+                  return (
+                    <div key={s.id}>
+                      <div className="flex justify-between text-xs mb-1" style={{ color: COLORS.ink }}><span>{meta.label}</span><span className="font-bold">{val}</span></div>
+                      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: COLORS.sand }}>
+                        <div className="h-full rounded-full" style={{ width: `${(val / maxStatus) * 100}%`, backgroundColor: meta.color }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="p-4 rounded-2xl bg-white">
+              <div className="text-sm font-bold mb-4" style={{ fontFamily: "Cairo", color: COLORS.navy }}>توزيع الطلبات حسب نوع المعاملة</div>
+              <div className="space-y-3">
+                {services.filter((s) => s.active).map((s) => {
+                  const val = stats.byService[s.id] || 0;
+                  return (
+                    <div key={s.id}>
+                      <div className="flex justify-between text-xs mb-1" style={{ color: COLORS.ink }}><span>{s.name}</span><span className="font-bold">{val}</span></div>
+                      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: COLORS.sand }}>
+                        <div className="h-full rounded-full" style={{ width: `${(val / maxService) * 100}%`, backgroundColor: COLORS.gold }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+        {tab === "services" && <ServicesPanel services={services} />}
+        {tab === "accounts" && <AccountsPanel />}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [authUser, setAuthUser] = useState(undefined);
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [citizen, setCitizen] = useState(null);
+  const [services, setServices] = useState([]);
+  const [staffError, setStaffError] = useState("");
+  const [staffBusy, setStaffBusy] = useState(false);
+
+  useEffect(() => auth.onAuthStateChanged(async (u) => {
+    setAuthUser(u);
+    if (u && !u.isAnonymous) {
+      setProfileLoading(true);
+      const doc = await db.collection("users").doc(u.uid).get();
+      setProfile(doc.exists ? doc.data() : null);
+      setProfileLoading(false);
+    } else {
+      setProfile(null);
+    }
+  }), []);
+
+  useEffect(() => db.collection("services").onSnapshot(async (snap) => {
+    if (snap.empty) {
+      const batch = db.batch();
+      DEFAULT_SERVICES.forEach((s) => batch.set(db.collection("services").doc(), s));
+      await batch.commit();
+      return;
+    }
+    setServices(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+  }), []);
+
+  const addRequest = useCallback(async (data) => {
+    const doc = await db.collection("requests").add({
+      ...data,
+      citizenUid: authUser.uid,
+      submittedAt: new Date().toISOString(),
+      status: "submitted",
+      history: data.notes ? [{ status: "submitted", at: new Date().toISOString(), note: data.notes }] : [],
+    });
+    return doc.id;
+  }, [authUser]);
+
+  const handleCitizenEnter = async (info) => {
+    setCitizen(info);
+    if (!auth.currentUser) await auth.signInAnonymously();
+  };
+
+  const handleStaffLogin = async (email, password) => {
+    setStaffError(""); setStaffBusy(true);
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (e) {
+      setStaffError("تعذّر تسجيل الدخول — تحقق من البريد وكلمة المرور");
+    } finally { setStaffBusy(false); }
+  };
+
+  const handleExit = async () => { await auth.signOut(); setCitizen(null); setProfile(null); };
+
+  if (authUser === undefined || services.length === 0) {
+    return <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: COLORS.sand }}><IconLoader spin size={28} color={COLORS.navy} /></div>;
+  }
+
+  if (authUser && authUser.isAnonymous && citizen) {
+    return <CitizenApp citizen={citizen} uid={authUser.uid} services={services} addRequest={addRequest} onExit={handleExit} />;
+  }
+
+  if (authUser && !authUser.isAnonymous) {
+    if (profileLoading) return <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: COLORS.sand }}><IconLoader spin size={28} color={COLORS.navy} /></div>;
+    if (!profile) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6 text-center" style={{ backgroundColor: COLORS.sand }}>
+          <div>
+            <IconAlert size={28} color={COLORS.rust} className="mx-auto mb-3" />
+            <p className="text-sm mb-4" style={{ color: COLORS.ink }}>هذا الحساب لا يملك صلاحية مسجّلة في النظام بعد. تواصل مع مسؤول النظام لإضافتك.</p>
+            <button onClick={handleExit} className="px-5 py-2.5 rounded-xl text-sm font-bold" style={{ backgroundColor: COLORS.navy, color: "white" }}>خروج</button>
+          </div>
+        </div>
+      );
+    }
+    if (profile.role === "admin") return <AdminApp services={services} onExit={handleExit} />;
+    if (profile.role === "employee") return <EmployeeApp services={services} onExit={handleExit} />;
+  }
+
+  return <EntryGate onCitizenEnter={handleCitizenEnter} onStaffLogin={handleStaffLogin} staffError={staffError} staffBusy={staffBusy} />;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 </script>
 </body>
 </html>
